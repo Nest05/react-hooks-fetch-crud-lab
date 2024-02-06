@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import axios from "axios";
 
-function QuestionForm(props) {
+function QuestionForm({updateQuestionList}) {
   const [formData, setFormData] = useState({
     prompt: "",
     answer1: "",
@@ -19,7 +20,39 @@ function QuestionForm(props) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    console.log(formData);
+  
+    // Send POST request to API
+    axios.post("http://localhost:4000/questions", {
+      prompt: formData.prompt,
+      answers: [
+        formData.answer1,
+        formData.answer2,
+        formData.answer3,
+        formData.answer4,
+      ],
+      correctIndex: formData.correctIndex,
+    }, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then(response => {
+      // Update QuestionList component with new question
+      updateQuestionList(response.data);
+
+      // Reset form data to empty values
+    setFormData({
+      prompt: "",
+      answer1: "",
+      answer2: "",
+      answer3: "",
+      answer4: "",
+      correctIndex: 0,
+    });
+    })
+    .catch(error => {
+      console.log(error);
+    });
   }
 
   return (
